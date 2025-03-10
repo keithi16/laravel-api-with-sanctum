@@ -30,7 +30,12 @@ class AuthController extends Controller
 
         // authenticate user
         $user = auth()->user();
-        $token = $user->createToken($user->name)->plainTextToken;
+
+        // assume o tempo de expiração que está configurado no Sanctum
+        // $token = $user->createToken($user->name)->plainTextToken;
+
+        // definir o tempo de expiração para o token
+        $token = $user->createToken($user->name, ['*'], now()->addHour())->plainTextToken;
 
         // return the access token for the api
         return ApiResponse::success(
@@ -40,5 +45,11 @@ class AuthController extends Controller
                 'token' => $token
             ]
         );
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return ApiResponse::success('Logout with success');
     }
 }
